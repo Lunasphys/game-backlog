@@ -4,15 +4,16 @@ import { requireAuth } from '@/lib/auth'
 
 export async function PATCH(
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const user = await requireAuth(req)
         const body = await req.json()
+        const resolvedParams = await params
 
         const game = await db.game.update({
             where: {
-                id: params.id,
+                id: resolvedParams.id,
                 tenantId: user.tenantId,
             },
             data: body
@@ -29,14 +30,15 @@ export async function PATCH(
 
 export async function DELETE(
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const user = await requireAuth(req)
+        const resolvedParams = await params
 
         await db.game.delete({
             where: {
-                id: params.id,
+                id: resolvedParams.id,
                 tenantId: user.tenantId,
             }
         })
