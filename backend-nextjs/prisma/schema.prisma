@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  tenantId  String
+  games     Game[]
+  createdAt DateTime @default(now())
+  @@index([tenantId])
+}
+
+model Game {
+  id        String   @id @default(uuid())
+  title     String
+  platform  String
+  status    String
+  priority  Int      @default(3)
+  genre     String?
+  coverUrl  String?
+  notes     String?
+  userId    String
+  tenantId  String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([tenantId, userId])
+  @@index([status])
+}
