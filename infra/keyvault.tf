@@ -33,4 +33,7 @@ resource "azurerm_key_vault_secret" "db_url" {
   name         = "DATABASE-URL"
   value        = "postgresql://gamebacklog_admin:${var.db_admin_password}@${azurerm_postgresql_flexible_server.main.fqdn}:5432/gamebacklog_dev"
   key_vault_id = azurerm_key_vault.main.id
+
+  # Wait for access policies to be applied before reading/writing secrets
+  depends_on = [azurerm_key_vault.main]
 }
