@@ -28,6 +28,10 @@ spec:
               value: "production"
             - name: PORT
               value: "3000"
+            - name: STEAM_API_KEY
+              value: ""
+            - name: REDIS_URL
+              value: "redis://redis:6379"
           livenessProbe:
             httpGet:
               path: /api/health
