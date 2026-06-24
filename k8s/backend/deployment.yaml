@@ -23,6 +23,10 @@ spec:
             - secretRef:
                 name: gamebacklog-secrets
           env:
+            - name: DATABASE_URL
+              value: "postgresql://app:changeme@postgres:5432/gamebacklog_dev"
+            - name: JWT_SECRET
+              value: "production-secret-minimum-32-characters-long"
             - name: NODE_ENV
               value: "production"
             - name: PORT
