@@ -18,11 +18,21 @@ spec:
           image: postgres:15-alpine
           env:
             - name: POSTGRES_USER
-              value: "app"
+              valueFrom:
+                secretKeyRef:
+                  name: gamebacklog-secrets
+                  key: POSTGRES_USER
             - name: POSTGRES_PASSWORD
-              value: "changeme"
+              valueFrom:
+                secretKeyRef:
+                  name: gamebacklog-secrets
+                  key: POSTGRES_PASSWORD
             - name: POSTGRES_DB
               value: "gamebacklog_dev"
+              valueFrom:
+                secretKeyRef:
+                  name: gamebacklog-secrets
+                  key: POSTGRES_DB
           ports:
             - containerPort: 5432
 ---

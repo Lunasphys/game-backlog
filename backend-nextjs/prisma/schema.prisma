@@ -7,30 +7,43 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum GameStatus {
+  wishlist
+  backlog
+  playing
+  completed
+  abandoned
+}
+
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
   password  String
   tenantId  String
+  steamId   String?
   games     Game[]
   createdAt DateTime @default(now())
   @@index([tenantId])
 }
 
 model Game {
-  id        String   @id @default(uuid())
-  title     String
-  platform  String
-  status    String
-  priority  Int      @default(3)
-  genre     String?
-  coverUrl  String?
-  notes     String?
-  userId    String
-  tenantId  String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String     @id @default(uuid())
+  title           String
+  platform        String
+  status          GameStatus
+  priority        Int        @default(3)
+  genre           String?
+  coverUrl        String?
+  notes           String?
+  rating          Int?
+  steamAppId      Int?
+  playtimeMinutes Int?
+  userId          String
+  tenantId        String
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  @@unique([steamAppId, userId])
   @@index([tenantId, userId])
   @@index([status])
 }
