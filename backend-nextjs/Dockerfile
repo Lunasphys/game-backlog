@@ -7,6 +7,18 @@ RUN apk add --no-cache openssl
 COPY package*.json ./
 RUN npm ci
 
+FROM node:20-alpine AS migrator
+WORKDIR /app
+
+# Install OpenSSL for Prisma
+RUN apk add --no-cache openssl
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY package*.json ./
+COPY prisma ./prisma
+
+CMD ["npx", "prisma", "migrate", "deploy"]
+
 FROM node:20-alpine AS builder
 WORKDIR /app
 

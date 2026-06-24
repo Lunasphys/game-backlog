@@ -34,9 +34,9 @@ yarn-debug.log*
 # OS
 Thumbs.db
 
-# Prisma
-prisma/migrations/
-
 # Testing
 coverage/
 .turbo
+
+# TypeScript
+*.tsbuildinfo
