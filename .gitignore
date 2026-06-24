@@ -9,3 +9,6 @@ yarn-error.log*
 .pnp.js
 
 .vscode/*
+
+# Kubernetes secrets (real values)
+k8s/secrets.yaml

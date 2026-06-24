@@ -15,6 +15,8 @@ const createGameSchema = z.object({
     coverUrl: z.url().optional(),
     notes: z.string().optional(),
     rating: z.number().min(1).max(10).optional(),
+    steamAppId: z.number().int().optional(),
+    playtimeMinutes: z.number().int().min(0).optional(),
 })
 
 export async function GET(req: NextRequest) {
