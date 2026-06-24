@@ -2,32 +2,45 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { requireAuth } from '@/lib/auth'
 import { z } from 'zod'
+import { publishEvent } from '@/lib/redis'
+
+const gameStatuses = ['wishlist', 'backlog', 'playing', 'completed', 'abandoned'] as const
 
 const createGameSchema = z.object({
     title: z.string().min(1).max(200),
     platform: z.string(),
-    status: z.enum(['wishlist', 'playing', 'completed', 'abandoned']),
+    status: z.enum(gameStatuses),
     priority: z.number().min(1).max(5).default(3),
     genre: z.string().optional(),
     coverUrl: z.url().optional(),
     notes: z.string().optional(),
+    rating: z.number().min(1).max(10).optional(),
 })
 
 export async function GET(req: NextRequest) {
     try {
         const user = await requireAuth(req)
+        const { searchParams } = new URL(req.url)
+
+        const status = searchParams.get('status')
+        const platform = searchParams.get('platform')
+        const search = searchParams.get('search')
+
+        const where: Record<string, unknown> = { tenantId: user.tenantId }
+        if (status) where.status = status
+        if (platform) where.platform = platform
+        if (search) where.title = { contains: search, mode: 'insensitive' }
 
         const games = await db.game.findMany({
-            where: { tenantId: user.tenantId },
+            where,
             orderBy: [
-                { status: 'asc' },
                 { priority: 'desc' },
-                { createdAt: 'desc' }
+                { updatedAt: 'desc' },
             ]
         })
 
         return NextResponse.json(games)
-    } catch (error) {
+    } catch {
         return NextResponse.json(
             { error: 'Unauthorized' },
             { status: 401 }
@@ -49,6 +62,7 @@ export async function POST(req: NextRequest) {
             }
         })
 
+        publishEvent('game:added', { title: game.title, status: game.status, platform: game.platform })
         return NextResponse.json(game, { status: 201 })
     } catch (error) {
         if (error instanceof z.ZodError) {
