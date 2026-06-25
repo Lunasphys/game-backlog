@@ -61,7 +61,7 @@ jobs:
 
       - name: Terraform Apply
         working-directory: infra/
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve -lock-timeout=5m
         env:
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
